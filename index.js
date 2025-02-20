@@ -6,7 +6,7 @@ const path = require('path');
 const products = require('./products');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(bodyParser.json());
 app.use(cors());
@@ -51,5 +51,5 @@ app.delete('/api/products/:id', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`Server is running on https://online-store-backend-three.vercel.app`);
+    console.log(`Server is running on port ${PORT}`);
 });
