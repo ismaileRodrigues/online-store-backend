@@ -32,6 +32,7 @@ app.post('/api/products', upload.single('image'), (req, res) => {
     const newProduct = {
         id: products.length + 1,
         name: req.body.name,
+        description: req.body.description, // Adicionando a descrição
         price: parseFloat(req.body.price),
         image: `/uploads/${req.file.filename}`
     };
