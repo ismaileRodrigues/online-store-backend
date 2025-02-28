@@ -1,40 +1,36 @@
+const cloudinary = require('cloudinary').v2;
 const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const multer = require('multer');
-const path = require('path');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 const products = require('./products');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Configuração de body parser para JSON
-app.use(bodyParser.json());
+// Configuração do Cloudinary
+cloudinary.config({
+    cloud_name: 'seu-cloud-name',
+    api_key: 'sua-api-key',
+    api_secret: 'sua-api-secret'
+});
 
-// Configuração do CORS
-app.use(cors({
-    origin: 'https://online-store-admin-portal.vercel.app', // Permitir apenas esta origem
-    methods: ['GET', 'POST', 'DELETE'], // Métodos permitidos
-    allowedHeaders: ['Content-Type'], // Cabeçalhos permitidos
-    credentials: true // Se precisar de cookies ou autenticação
-}));
-
-// Servir arquivos estáticos para uploads
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-
-// Configuração do multer para upload de arquivos
-const storage = multer.diskStorage({
-    destination: (req, file, cb) => {
-        cb(null, 'uploads/');
-    },
-    filename: (req, file, cb) => {
-        cb(null, Date.now() + path.extname(file.originalname)); // Nome único para o arquivo
+// Configuração do multer com storage no Cloudinary
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'products', // Pasta onde as imagens serão armazenadas no Cloudinary
+        allowed_formats: ['jpg', 'jpeg', 'png'] // Formatos permitidos
     }
 });
 
 const upload = multer({ storage });
 
-// Endpoint para obter produtos
+app.use(bodyParser.json());
+app.use(cors());
+
+// Endpoint para listar produtos
 app.get('/api/products', (req, res) => {
     res.json(products);
 });
@@ -50,7 +46,7 @@ app.post('/api/products', upload.single('image'), (req, res) => {
         name: req.body.name,
         description: req.body.description,
         price: parseFloat(req.body.price),
-        image: `/uploads/${req.file.filename}`
+        image: req.file.path // URL da imagem armazenada no Cloudinary
     };
 
     products.push(newProduct);
@@ -70,7 +66,6 @@ app.delete('/api/products/:id', (req, res) => {
     }
 });
 
-// Inicializar servidor
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
