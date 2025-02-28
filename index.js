@@ -11,10 +11,11 @@ const PORT = process.env.PORT || 3000;
 
 // Configuração do Cloudinary
 cloudinary.config({
-    cloud_name: 'seu-cloud-name',
-    api_key: 'sua-api-key',
-    api_secret: 'sua-api-secret'
+    cloud_name: 'dopruzxku',
+    api_key: '536127753752631',
+    api_secret: 'HawnvSLpWas_QkTYyqoPw4yb9OI'
 });
+
 
 // Configuração do multer com storage no Cloudinary
 const storage = new CloudinaryStorage({
