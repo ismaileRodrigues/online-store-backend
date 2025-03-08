@@ -1,4 +1,4 @@
-require('dotenv').config(); // Para usar variáveis de ambiente
+require('dotenv').config();
 const mongoose = require('mongoose');
 const cloudinary = require('cloudinary').v2;
 const express = require('express');
@@ -6,13 +6,12 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const products = require('./products'); // Certifique-se de que este arquivo existe e exporta os produtos como um array ou objeto
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Configuração do MongoDB
-const mongoURI = process.env.MONGO_URI || 'mongodb+srv://ismailearliene:oK7PnhpEU5UJMvm1.mongodb.net/?retryWrites=true&w=majority';
+const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/online-store';
 mongoose.connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -21,6 +20,16 @@ mongoose.connect(mongoURI, {
 }).catch((err) => {
     console.error('Erro ao conectar ao MongoDB', err);
 });
+
+// Definindo o modelo de Produto
+const productSchema = new mongoose.Schema({
+    name: String,
+    description: String,
+    price: Number,
+    image: String // URL da imagem no Cloudinary
+});
+
+const Product = mongoose.model('Product', productSchema);
 
 // Configuração do Cloudinary
 cloudinary.config({
@@ -44,39 +53,38 @@ app.use(bodyParser.json());
 app.use(cors());
 
 // Endpoint para listar produtos
-app.get('/api/products', (req, res) => {
+app.get('/api/products', async (req, res) => {
+    const products = await Product.find();
     res.json(products);
 });
 
 // Endpoint para adicionar um produto
-app.post('/api/products', upload.single('image'), (req, res) => {
+app.post('/api/products', upload.single('image'), async (req, res) => {
     if (!req.body.name || !req.body.price || !req.file) {
         return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
     }
 
-    const newProduct = {
-        id: products.length + 1,
+    const newProduct = new Product({
         name: req.body.name,
         description: req.body.description,
         price: parseFloat(req.body.price),
         image: req.file.path // URL da imagem armazenada no Cloudinary
-    };
+    });
 
-    products.push(newProduct);
+    await newProduct.save();
     res.status(201).json(newProduct);
 });
 
 // Endpoint para deletar um produto
-app.delete('/api/products/:id', (req, res) => {
-    const productId = parseInt(req.params.id, 10);
-    const index = products.findIndex(product => product.id === productId);
+app.delete('/api/products/:id', async (req, res) => {
+    const productId = req.params.id;
+    const product = await Product.findByIdAndDelete(productId);
 
-    if (index !== -1) {
-        products.splice(index, 1);
-        res.status(204).send(); // No Content
-    } else {
-        res.status(404).json({ message: 'Produto não encontrado.' });
+    if (!product) {
+        return res.status(404).json({ message: 'Produto não encontrado.' });
     }
+
+    res.status(204).send(); // No Content
 });
 
 // Tratamento de erros globais
