@@ -1,3 +1,4 @@
+require('dotenv').config(); // Para usar variáveis de ambiente
 const mongoose = require('mongoose');
 const cloudinary = require('cloudinary').v2;
 const express = require('express');
@@ -5,13 +6,13 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const products = require('./products');
+const products = require('./products'); // Certifique-se de que este arquivo existe e exporta os produtos como um array ou objeto
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Configuração do MongoDB
-const mongoURI = 'mongodb+srv://ismailearliene:oK7PnhpEU5UJMvm1@cluster0.cpuoo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+const mongoURI = process.env.MONGO_URI || 'mongodb+srv://ismailearliene:oK7PnhpEU5UJMvm1.mongodb.net/?retryWrites=true&w=majority';
 mongoose.connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
@@ -23,9 +24,9 @@ mongoose.connect(mongoURI, {
 
 // Configuração do Cloudinary
 cloudinary.config({
-    cloud_name: 'dopruzxku',
-    api_key: '536127753752631',
-    api_secret: 'HawnvSLpWas_QkTYyqoPw4yb9OI'
+    cloud_name: process.env.CLOUD_NAME || 'dopruzxku',
+    api_key: process.env.CLOUD_API_KEY || '536127753752631',
+    api_secret: process.env.CLOUD_API_SECRET || 'HawnvSLpWas_QkTYyqoPw4yb9OI'
 });
 
 // Configuração do multer com storage no Cloudinary
@@ -78,6 +79,13 @@ app.delete('/api/products/:id', (req, res) => {
     }
 });
 
+// Tratamento de erros globais
+app.use((err, req, res, next) => {
+    console.error(err.stack);
+    res.status(500).send({ message: 'Algo deu errado!' });
+});
+
+// Iniciando o servidor
 app.listen(PORT, () => {
     console.log(`Servidor rodando na porta ${PORT}`);
 });
