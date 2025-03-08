@@ -1,16 +1,22 @@
 {
-  "name": "online-store-backend",
+  "name": "online-store",
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js"
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
   "dependencies": {
-    "express": "^4.17.1",
-    "body-parser": "^1.19.0",
+    "body-parser": "^1.20.3",
+    "cloudinary": "^2.5.1",
     "cors": "^2.8.5",
-    "multer": "^1.4.2",
-    "cloudinary": "^1.0.0",
+    "express": "^4.21.2",
+    "firebase-admin": "^13.1.0",
+    "mongoose": "^8.10.1",
+    "multer": "^1.4.5-lts.1",
     "multer-storage-cloudinary": "^4.0.0"
   }
 }
