@@ -1,3 +1,4 @@
+const mongoose = require('mongoose');
 const cloudinary = require('cloudinary').v2;
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -9,13 +10,23 @@ const products = require('./products');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Configuração do MongoDB
+const mongoURI = 'mongodb+srv://ismailearliene:oK7PnhpEU5UJMvm1@cluster0.cpuoo.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+mongoose.connect(mongoURI, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+}).then(() => {
+    console.log('Conectado ao MongoDB');
+}).catch((err) => {
+    console.error('Erro ao conectar ao MongoDB', err);
+});
+
 // Configuração do Cloudinary
 cloudinary.config({
     cloud_name: 'dopruzxku',
     api_key: '536127753752631',
     api_secret: 'HawnvSLpWas_QkTYyqoPw4yb9OI'
 });
-
 
 // Configuração do multer com storage no Cloudinary
 const storage = new CloudinaryStorage({
