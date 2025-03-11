@@ -55,7 +55,10 @@ const upload = multer({ storage });
 
 // Middlewares
 app.use(bodyParser.json());
-app.use(cors());
+// Configuração do CORS para permitir apenas o domínio do admin portal:
+app.use(cors({
+    origin: 'https://online-store-admin-portal.vercel.app'
+}));
 
 // Endpoint para listar produtos
 app.get('/api/products', async (req, res) => {
