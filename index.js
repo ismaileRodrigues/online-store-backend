@@ -1,7 +1,7 @@
 require('dotenv').config();
+const express = require('express');
 const mongoose = require('mongoose');
 const cloudinary = require('cloudinary').v2;
-const express = require('express');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const multer = require('multer');
@@ -11,18 +11,19 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Configuração do MongoDB
-const mongoose = require('mongoose');
-
 const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/online-store-backend';
 
-mongoose.connect(mongoURI)
-    .then(() => {
-        console.log('Conectado ao MongoDB');
-    })
-    .catch((err) => {
-        console.error('Erro ao conectar ao MongoDB', err);
-    });
+async function connectDB() {
+    try {
+        await mongoose.connect(mongoURI);
+        console.log('✅ Conectado ao MongoDB');
+    } catch (err) {
+        console.error('❌ Erro ao conectar ao MongoDB:', err);
+        process.exit(1); // Encerra o servidor caso a conexão falhe
+    }
+}
 
+connectDB();
 
 // Definindo o modelo de Produto
 const productSchema = new mongoose.Schema({
@@ -52,6 +53,7 @@ const storage = new CloudinaryStorage({
 
 const upload = multer({ storage });
 
+// Middlewares
 app.use(bodyParser.json());
 app.use(cors());
 
@@ -110,5 +112,5 @@ app.use((err, req, res, next) => {
 
 // Iniciando o servidor
 app.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
+    console.log(`🚀 Servidor rodando na porta ${PORT}`);
 });
