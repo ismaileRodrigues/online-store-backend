@@ -33,9 +33,9 @@ const Product = mongoose.model('Product', productSchema);
 
 // Configuração do Cloudinary
 cloudinary.config({
-    cloud_name: process.env.dopruzxku,
-    api_key: process.env.536127753752631,
-    api_secret: process.env.HawnvSLpWas_QkTYyqoPw4yb9OI
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET
 });
 
 // Configuração do multer com storage no Cloudinary
