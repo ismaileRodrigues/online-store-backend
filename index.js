@@ -63,7 +63,8 @@ app.get('/api/products', async (req, res) => {
         const products = await Product.find();
         res.json(products);
     } catch (err) {
-        res.status(500).json({ message: 'Erro ao listar produtos.' });
+        console.error("Erro ao listar produtos:", err);
+        res.status(500).json({ message: 'Erro ao listar produtos.', error: err.message });
     }
 });
 
