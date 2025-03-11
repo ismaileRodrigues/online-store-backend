@@ -11,7 +11,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 // Configuração do MongoDB
-const mongoURI = process.env.MONGO_URI || 'mongodb://localhost:27017/online-store';
+const mongoURI = process.env.MONGO_URI || 'mongodb://https://online-store-backend-vw45.onrender.com';
 mongoose.connect(mongoURI, {
     useNewUrlParser: true,
     useUnifiedTopology: true
