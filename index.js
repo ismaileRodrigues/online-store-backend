@@ -23,7 +23,7 @@ async function connectDB() {
     } catch (err) {
         console.error('❌ Erro ao conectar ao MongoDB:', err.message);
         console.error('Detalhes do erro:', err);
-        process.exit(1); // Encerra o servidor caso a conexão falhe
+        process.exit(1);
     }
 }
 
@@ -34,7 +34,8 @@ const productSchema = new mongoose.Schema({
     name: { type: String, required: true },
     description: String,
     price: { type: Number, required: true },
-    image: String // URL da imagem no Cloudinary
+    image: String, // URL da imagem no Cloudinary
+    category: { type: String, required: false } // Adicionado campo category
 });
 
 const Product = mongoose.model('Product', productSchema);
@@ -50,8 +51,8 @@ cloudinary.config({
 const storage = new CloudinaryStorage({
     cloudinary: cloudinary,
     params: {
-        folder: 'products', // Pasta onde as imagens serão armazenadas no Cloudinary
-        allowed_formats: ['jpg', 'jpeg', 'png'] // Formatos permitidos
+        folder: 'products',
+        allowed_formats: ['jpg', 'jpeg', 'png']
     }
 });
 
@@ -59,11 +60,10 @@ const upload = multer({ storage });
 
 // Middlewares
 app.use(bodyParser.json());
-// Configuração do CORS para permitir apenas o domínio do admin portal:
 app.use(cors({
     origin: [
         'https://online-store-admin-portal.vercel.app',
-        'https://oline-store-frontend.vercel.app' ,
+        'https://oline-store-frontend.vercel.app',
         'http://127.0.0.1:5500'
     ]
 }));
@@ -82,21 +82,23 @@ app.get('/api/products', async (req, res) => {
 // Endpoint para adicionar um produto
 app.post('/api/products', upload.single('image'), async (req, res) => {
     if (!req.body.name || !req.body.price || !req.file) {
-        return res.status(400).json({ message: 'Todos os campos são obrigatórios.' });
+        return res.status(400).json({ message: 'Nome, preço e imagem são obrigatórios.' });
     }
 
     try {
         const newProduct = new Product({
             name: req.body.name,
-            description: req.body.description,
+            description: req.body.description || '', // Default para vazio se não fornecido
             price: parseFloat(req.body.price),
-            image: req.file.path // URL da imagem armazenada no Cloudinary
+            image: req.file.path, // URL da imagem armazenada no Cloudinary
+            category: req.body.category || '' // Adicionado suporte a category
         });
 
         await newProduct.save();
         res.status(201).json(newProduct);
     } catch (err) {
-        res.status(500).json({ message: 'Erro ao adicionar produto.' });
+        console.error('Erro ao adicionar produto:', err);
+        res.status(500).json({ message: 'Erro ao adicionar produto.', error: err.message });
     }
 });
 
@@ -110,9 +112,16 @@ app.delete('/api/products/:id', async (req, res) => {
             return res.status(404).json({ message: 'Produto não encontrado.' });
         }
 
-        res.status(204).send(); // No Content
+        // Opcional: Remover a imagem do Cloudinary
+        if (product.image) {
+            const publicId = product.image.split('/').pop().split('.')[0];
+            await cloudinary.uploader.destroy(`products/${publicId}`);
+        }
+
+        res.status(204).send();
     } catch (err) {
-        res.status(500).json({ message: 'Erro ao deletar produto.' });
+        console.error('Erro ao deletar produto:', err);
+        res.status(500).json({ message: 'Erro ao deletar produto.', error: err.message });
     }
 });
 
