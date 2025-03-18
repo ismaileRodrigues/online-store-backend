@@ -63,7 +63,7 @@ app.use(bodyParser.json());
 app.use(cors({
     origin: [
         'https://online-store-admin-portal.vercel.app',
-        'https://online-store-frontend.vercel.app' ,
+        'https://oline-store-frontend.vercel.app' ,
         'http://127.0.0.1:5500'
     ]
 }));
