@@ -29,13 +29,20 @@ async function connectDB() {
 
 connectDB();
 
+// Definindo o modelo de Categoria
+const categorySchema = new mongoose.Schema({
+    name: { type: String, required: true, unique: true }
+});
+
+const Category = mongoose.model('Category', categorySchema);
+
 // Definindo o modelo de Produto
 const productSchema = new mongoose.Schema({
     name: { type: String, required: true },
     description: String,
     price: { type: Number, required: true },
     image: String, // URL da imagem no Cloudinary
-    category: { type: String, required: false } // Adicionado campo category
+    category: { type: String, required: false } // Campo category
 });
 
 const Product = mongoose.model('Product', productSchema);
@@ -63,10 +70,55 @@ app.use(bodyParser.json());
 app.use(cors({
     origin: [
         'https://online-store-admin-portal.vercel.app',
-        'https://oline-store-frontend.vercel.app',
+        'https://oline-store-frontend.vercel.app', 
         'http://127.0.0.1:5500'
     ]
 }));
+
+// Endpoint para listar categorias
+app.get('/api/categories', async (req, res) => {
+    try {
+        const categories = await Category.find();
+        res.json(categories.map(cat => cat.name));
+    } catch (err) {
+        console.error('Erro ao listar categorias:', err);
+        res.status(500).json({ message: 'Erro ao listar categorias.', error: err.message });
+    }
+});
+
+// Endpoint para adicionar uma categoria
+app.post('/api/categories', async (req, res) => {
+    const { name } = req.body;
+    if (!name) {
+        return res.status(400).json({ message: 'O nome da categoria é obrigatório.' });
+    }
+    try {
+        const newCategory = new Category({ name });
+        await newCategory.save();
+        res.status(201).json({ name });
+    } catch (err) {
+        if (err.code === 11000) { // Erro de duplicação
+            return res.status(400).json({ message: 'Esta categoria já existe.' });
+        }
+        console.error('Erro ao adicionar categoria:', err);
+        res.status(500).json({ message: 'Erro ao adicionar categoria.', error: err.message });
+    }
+});
+
+// Endpoint para deletar uma categoria
+app.delete('/api/categories/:name', async (req, res) => {
+    const { name } = req.params;
+    try {
+        const category = await Category.findOneAndDelete({ name });
+        if (!category) {
+            return res.status(404).json({ message: 'Categoria não encontrada.' });
+        }
+        res.status(204).send();
+    } catch (err) {
+        console.error('Erro ao deletar categoria:', err);
+        res.status(500).json({ message: 'Erro ao deletar categoria.', error: err.message });
+    }
+});
 
 // Endpoint para listar produtos
 app.get('/api/products', async (req, res) => {
@@ -74,7 +126,7 @@ app.get('/api/products', async (req, res) => {
         const products = await Product.find();
         res.json(products);
     } catch (err) {
-        console.error("Erro ao listar produtos:", err);
+        console.error('Erro ao listar produtos:', err);
         res.status(500).json({ message: 'Erro ao listar produtos.', error: err.message });
     }
 });
@@ -88,10 +140,10 @@ app.post('/api/products', upload.single('image'), async (req, res) => {
     try {
         const newProduct = new Product({
             name: req.body.name,
-            description: req.body.description || '', // Default para vazio se não fornecido
+            description: req.body.description || '',
             price: parseFloat(req.body.price),
-            image: req.file.path, // URL da imagem armazenada no Cloudinary
-            category: req.body.category || '' // Adicionado suporte a category
+            image: req.file.path,
+            category: req.body.category || ''
         });
 
         await newProduct.save();
@@ -112,7 +164,6 @@ app.delete('/api/products/:id', async (req, res) => {
             return res.status(404).json({ message: 'Produto não encontrado.' });
         }
 
-        // Opcional: Remover a imagem do Cloudinary
         if (product.image) {
             const publicId = product.image.split('/').pop().split('.')[0];
             await cloudinary.uploader.destroy(`products/${publicId}`);
