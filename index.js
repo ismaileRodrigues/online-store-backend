@@ -71,7 +71,8 @@ app.use(cors({
     origin: [
         'https://online-store-admin-portal.vercel.app',
         'https://oline-store-frontend.vercel.app', 
-        'http://127.0.0.1:5500'
+        'http://127.0.0.1:5500',
+      "https://loja-oline-cliente.vercel.app"
     ]
 }));
 
