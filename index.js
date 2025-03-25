@@ -76,6 +76,20 @@ app.use(cors({
     ]
 }));
 
+// Estado da loja
+let storeStatus = 'open';
+
+// Endpoint para obter o estado da loja
+app.get('/api/store-status', (req, res) => {
+    res.json({ status: storeStatus });
+});
+
+// Endpoint para atualizar o estado da loja
+app.post('/api/store-status', (req, res) => {
+    storeStatus = req.body.status;
+    res.json({ status: storeStatus });
+});
+
 // Endpoint para listar categorias
 app.get('/api/categories', async (req, res) => {
     try {
