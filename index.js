@@ -65,12 +65,7 @@ const upload = multer({ storage });
 // Middlewares
 app.use(bodyParser.json());
 app.use(cors({
-    origin: [
-        'https://online-store-admin-portal.vercel.app',
-        'https://online-store-frontend.vercel.app',
-        'http://127.0.0.1:5500',
-        'https://loja-online-cliente.vercel.app'
-    ]
+    origin: 'https://loja-oline-cliente.vercel.app'
 }));
 
 // Estado da loja
