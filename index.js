@@ -63,8 +63,8 @@ app.use(cors({
         'https://oline-store-frontend.vercel.app',
         'http://127.0.0.1:5500',
         'https://loja-oline-cliente.vercel.app',
-'https://yakcmkon.manus.space/',
-'https://pmunxbym.manus.space/',
+'https://yakcmkon.manus.space',
+'https://pmunxbym.manus.space',
     ]
 }));
 
