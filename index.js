@@ -62,7 +62,7 @@ app.use(cors({
         'https://online-store-admin-portal.vercel.app',
         'http://127.0.0.1:5500',
         'https://loja-oline-cliente.vercel.app',
-        'donutstia-loja-online.vercel.app',
+        'https://donutstia-loja-online.vercel.app',
 
     ]
 }));
