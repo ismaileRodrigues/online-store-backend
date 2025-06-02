@@ -64,8 +64,8 @@ app.use(cors({
     'https://loja-oline-cliente.vercel.app',
     'https://donutstia-loja-online.vercel.app'
   ]
-});
-);
+}); // <- Aqui está o erro
+
 
 // Endpoints de estado da loja
 app.get('/api/store-status', async (req, res) => {
