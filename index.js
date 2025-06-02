@@ -58,14 +58,14 @@ const upload = multer({ storage });
 // Middlewares
 app.use(bodyParser.json());
 app.use(cors({
-    origin: [
-        'https://online-store-admin-portal.vercel.app',
-        'http://127.0.0.1:5500',
-        'https://loja-oline-cliente.vercel.app',
-        'https://donutstia-loja-online.vercel.app',
-
-    ]
-}));
+  origin: [
+    'https://online-store-admin-portal.vercel.app',
+    'http://127.0.0.1:5500',
+    'https://loja-oline-cliente.vercel.app',
+    'https://donutstia-loja-online.vercel.app'
+  ]
+});
+);
 
 // Endpoints de estado da loja
 app.get('/api/store-status', async (req, res) => {
